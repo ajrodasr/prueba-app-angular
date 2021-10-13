@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.security.service.UsuarioRepository">
+
+	<resultMap id="usuario" type="com.example.demo.security.domain.Usuario">
+		<id column="ID_USUARIO" property="id" />
+		<result column="NOMBRE_USUARIO" property="nombre" />
+		<result column="APELLIDO1_USUARIO" property="apellido1" />
+		<result column="APELLIDO2_USUARIO" property="apellido2" />
+		<result column="PASSWORD_USUARIO" property="password" />
+		<result column="EMAIL_USUARIO" property="email" />
+		<collection javaType="ArrayList" property="roles" resultMap="rol"/>
+	</resultMap>
+	
+	<resultMap id="rol" type="com.example.demo.security.domain.Rol">
+		<id column="ID_ROL" property="id" />
+		<result column="NOMBRE_ROL" property="rolNombre" />
+	</resultMap>
+
+	<select id="getUsuarioById" resultMap="usuario">
+		SELECT u.ID AS ID_USUARIO,
+			u.NOMBRE AS NOMBRE_USUARIO,
+			u.APELLIDO1 AS APELLIDO1_USUARIO,
+			u.APELLIDO2 AS APELLIDO2_USUARIO,
+			u.EMAIL AS EMAIL_USUARIO,
+			u.PASSWORD AS PASSWORD_USUARIO,
+			r.ID AS ID_ROL,
+			r.NOMBRE AS NOMBRE_ROL
+		FROM usuarios u 
+		JOIN usuario_rol ur ON ur.USUARIO = u.ID
+		JOIN roles r ON r.ID = ur.ROL
+		WHERE u.ID = #{idUsuario}
+	</select>
+
+	<select id="getUsuarioByEmail" resultMap="usuario">
+		SELECT u.ID AS ID_USUARIO,
+			u.NOMBRE AS NOMBRE_USUARIO,
+			u.APELLIDO1 AS APELLIDO1_USUARIO,
+			u.APELLIDO2 AS APELLIDO2_USUARIO,
+			u.EMAIL AS EMAIL_USUARIO,
+			u.PASSWORD AS PASSWORD_USUARIO,
+			r.ID AS ID_ROL,
+			r.NOMBRE AS NOMBRE_ROL
+		FROM usuarios u 
+		JOIN usuario_rol ur ON ur.USUARIO = u.ID
+		JOIN roles r ON r.ID = ur.ROL
+		WHERE u.EMAIL = #{idUsuario}
+	</select>
+
+	<insert id="saveUsuario">
+		INSERT INTO USUARIOS (ID, NOMBRE, APELLIDO1,
+		APELLIDO2, EMAIL, PASSWORD)
+		VALUES (#{id}, #{nombre},
+		#{apellido1},
+		#{apellido2}, #{email},
+		#{password})
+	</insert>
+
+	<insert id="saveRolUsuario">
+		INSERT INTO USUARIO_ROL (USUARIO,ROL) values
+		<foreach collection="roles" item="element" index="index" open="(" separator="),("  close=")">
+		  #{idUsuario}, #{element.id}
+		</foreach>
+	</insert>
+
+</mapper>
