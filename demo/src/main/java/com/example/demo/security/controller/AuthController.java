@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +48,7 @@ public class AuthController {
 	
 	@PostMapping("/nuevo")
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public ResponseEntity<?> nuevo(@RequestBody NuevoUsuario nuevoUsuario) {
+	public ResponseEntity<JwtDto> nuevo(@RequestBody NuevoUsuario nuevoUsuario) {
 		if (usuarioService.existsUsuarioById(nuevoUsuario.getId())) {
 			return new ResponseEntity("El usuario ya existe", HttpStatus.BAD_REQUEST);
 		}
@@ -62,6 +61,7 @@ public class AuthController {
 				nuevoUsuario.getEmail());
 		
 		List<Rol> roles = new ArrayList<Rol>();
+		roles.add(rolService.getRolByNombre("ROLE_USER"));
 		for(String rolNombre : nuevoUsuario.getRoles()) {
 			Rol rol = rolService.getRolByNombre(rolNombre);
 			if(rol == null) {
@@ -80,8 +80,7 @@ public class AuthController {
 		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginUsuario.getId(), loginUsuario.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtProvider.generateToken(authentication);
-		UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-		JwtDto jwtDto = new JwtDto(jwt, userDetails.getUsername(), userDetails.getAuthorities());
+		JwtDto jwtDto = new JwtDto(jwt);
 		return new ResponseEntity(jwtDto, HttpStatus.OK);
 	}
 }
