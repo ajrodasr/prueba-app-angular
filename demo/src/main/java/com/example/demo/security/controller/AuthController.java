@@ -1,5 +1,6 @@
 package com.example.demo.security.controller;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,5 +83,12 @@ public class AuthController {
 		String jwt = jwtProvider.generateToken(authentication);
 		JwtDto jwtDto = new JwtDto(jwt);
 		return new ResponseEntity(jwtDto, HttpStatus.OK);
+	}
+	
+	@PostMapping("/refresh")
+	public ResponseEntity<JwtDto> refreshToken (@RequestBody JwtDto jwtDto) throws ParseException{
+		String token = jwtProvider.refreshToken(jwtDto);
+		JwtDto jwt = new JwtDto(token);
+		return new ResponseEntity<JwtDto>(jwt, HttpStatus.OK);
 	}
 }

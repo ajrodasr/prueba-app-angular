@@ -1,5 +1,6 @@
 package com.example.demo.security.jwt;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -12,6 +13,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.security.domain.UsuarioPrincipal;
+import com.example.demo.security.dto.JwtDto;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,7 +38,7 @@ public class JwtProvider {
 				.setSubject(usuarioPrincipal.getUsername())
 				.claim("roles", roles)
 				.setIssuedAt(new Date())
-				.setExpiration(new Date(new Date().getTime() + expiration * 1000))
+				.setExpiration(new Date(new Date().getTime() + expiration))
 				.signWith(SignatureAlgorithm.HS512, secret.getBytes())
 				.compact();
 	}
@@ -50,5 +55,20 @@ public class JwtProvider {
 			log.error("Error en la validación del token", e);
 		}
 		return false;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public String refreshToken(JwtDto jwtDto) throws ParseException {
+		JWT jwt = JWTParser.parse(jwtDto.getToken());
+		JWTClaimsSet claims = jwt.getJWTClaimsSet();
+		String idUsuario = claims.getSubject();
+		List<String> roles = (List<String>) claims.getClaim("roles");
+		return Jwts.builder()
+				.setSubject(idUsuario)
+				.claim("roles", roles)
+				.setIssuedAt(new Date())
+				.setExpiration(new Date(new Date().getTime() + expiration))
+				.signWith(SignatureAlgorithm.HS512, secret.getBytes())
+				.compact();
 	}
 }

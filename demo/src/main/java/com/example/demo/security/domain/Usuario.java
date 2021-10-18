@@ -11,6 +11,7 @@ public class Usuario {
 	private String apellido2;
 	private String password;
 	private String email;
+	private String tokenPassword;
 	private List<Rol> roles = new ArrayList<Rol>();
 	
 	public Usuario(String id, String nombre, String apellido1, String apellido2, String password, String email) {
@@ -57,6 +58,12 @@ public class Usuario {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getTokenPassword() {
+		return tokenPassword;
+	}
+	public void setTokenPassword(String tokenPassword) {
+		this.tokenPassword = tokenPassword;
 	}
 	public List<Rol> getRoles() {
 		return roles;

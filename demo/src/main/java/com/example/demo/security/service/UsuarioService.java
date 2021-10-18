@@ -25,8 +25,20 @@ public class UsuarioService {
 		return usuarioRepository.getUsuarioByEmail(email);
 	}
 	
+	public Usuario getUsuarioByIdOrEmail (String idOrEmail) {
+		return usuarioRepository.getUsuarioByIdOrEmail(idOrEmail);
+	}
+	
 	public boolean existsUsuarioByEmail(String email) {
 		return usuarioRepository.getUsuarioByEmail(email) != null;
+	}
+	
+	public void update(Usuario usuario) {
+		usuarioRepository.updateUsuario(usuario);
+	}
+	
+	public Usuario getUsuarioByTokenPassword (String tokenPassword) {
+		return usuarioRepository.getUsuarioByTokenPassword(tokenPassword);
 	}
 	
 	public void save(Usuario usuario) {
